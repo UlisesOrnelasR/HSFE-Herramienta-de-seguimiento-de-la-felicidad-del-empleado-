@@ -1,5 +1,16 @@
 import React from "react";
+import { AppBar, Typography, Toolbar } from "@mui/material";
 
-export const Navbar: React.FC = () => {
-  return <div>Navbar</div>;
+interface NavbarProps {}
+
+export const Navbar: React.FC<NavbarProps> = () => {
+  return (
+    <AppBar position="fixed">
+      <Toolbar>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          SDLFDE
+        </Typography>
+      </Toolbar>
+    </AppBar>
+  );
 };
