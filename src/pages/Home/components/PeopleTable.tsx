@@ -1,24 +1,24 @@
-import { useState } from "react";
 import { Person } from "@/models";
-import { AppStore } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
 import { addFavorite } from "@/redux/states";
+import { AppStore } from "@/redux/store";
 import { Checkbox } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-interface PeopleTableInterface {}
+export interface PeopleTableInterface {}
 
 export const PeopleTable: React.FC<PeopleTableInterface> = () => {
   const [selectedPeople, setSelectedPeople] = useState<Person[]>([]);
-  const pageSizes = 5;
+  const pageSize = 5;
   const dispatch = useDispatch();
   const statePeople = useSelector((store: AppStore) => store.people);
+  const favoritePeople = useSelector((store: AppStore) => store.favorites);
 
   const findPerson = (person: Person) =>
-    !!selectedPeople.find((p) => p.id === person.id);
-
+    !!favoritePeople.find((p) => p.id === person.id);
   const filterPerson = (person: Person) =>
-    selectedPeople.filter((p) => p.id !== person.id);
+    favoritePeople.filter((p) => p.id !== person.id);
 
   const handleChange = (person: Person) => {
     const filteredPeople = findPerson(person)
@@ -28,7 +28,7 @@ export const PeopleTable: React.FC<PeopleTableInterface> = () => {
     setSelectedPeople(filteredPeople);
   };
 
-  const columns = [
+  const colums = [
     {
       field: "actions",
       type: "actions",
@@ -58,28 +58,35 @@ export const PeopleTable: React.FC<PeopleTableInterface> = () => {
       field: "category",
       headerName: "Categories",
       flex: 1,
-      minWidth: 150,
       renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
     },
     {
       field: "company",
       headerName: "Company",
       flex: 1,
-      minWidth: 150,
+      renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
+    },
+    {
+      field: "levelOfHappiness",
+      headerName: "Level of happiness",
+      flex: 1,
       renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
     },
   ];
 
+  useEffect(() => {
+    setSelectedPeople(favoritePeople);
+  }, [favoritePeople]);
   return (
     <DataGrid
+      rows={statePeople}
+      columns={colums}
       disableColumnSelector
       disableSelectionOnClick
       autoHeight
-      pageSize={pageSizes}
-      rowsPerPageOptions={[pageSizes]}
-      rows={statePeople}
-      columns={columns}
-      getRowId={(row) => row.id}
+      pageSize={pageSize}
+      rowsPerPageOptions={[pageSize]}
+      getRowId={(row: any) => row.id}
     />
   );
 };

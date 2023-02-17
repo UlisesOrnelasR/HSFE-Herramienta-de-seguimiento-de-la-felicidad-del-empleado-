@@ -1,34 +1,24 @@
-import { useState } from "react";
 import { Person } from "@/models";
+import { removeFavorite } from "@/redux/states";
 import { AppStore } from "@/redux/store";
-import { useDispatch, useSelector } from "react-redux";
-import { addFavorite } from "@/redux/states";
-import { Checkbox } from "@mui/material";
+import { Delete } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import { DataGrid, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-interface FavoriteTableInterface {}
+export interface FavoriteTableInterface {}
 
 export const FavoriteTable: React.FC<FavoriteTableInterface> = () => {
-  const [selectedPeople, setSelectedPeople] = useState<Person[]>([]);
-  const pageSizes = 5;
+  const pageSize = 5;
   const dispatch = useDispatch();
   const stateFavorites = useSelector((store: AppStore) => store.favorites);
 
-  const findPerson = (person: Person) =>
-    !!selectedPeople.find((p) => p.id === person.id);
-
-  const filterPerson = (person: Person) =>
-    selectedPeople.filter((p) => p.id !== person.id);
-
-  const handleChange = (person: Person) => {
-    const filteredPeople = findPerson(person)
-      ? filterPerson(person)
-      : [...selectedPeople, person];
-    dispatch(addFavorite(filteredPeople));
-    setSelectedPeople(filteredPeople);
+  const handleClick = (person: Person) => {
+    dispatch(removeFavorite(person));
   };
 
-  const columns = [
+  const colums = [
     {
       field: "actions",
       type: "actions",
@@ -38,11 +28,14 @@ export const FavoriteTable: React.FC<FavoriteTableInterface> = () => {
       renderCell: (params: GridRenderCellParams) => (
         <>
           {
-            <Checkbox
-              size="small"
-              checked={findPerson(params.row)}
-              onChange={() => handleChange(params.row)}
-            />
+            <IconButton
+              color="secondary"
+              aria-label="favorites"
+              component="label"
+              onClick={() => handleClick(params.row)}
+            >
+              <Delete />
+            </IconButton>
           }
         </>
       ),
@@ -58,28 +51,31 @@ export const FavoriteTable: React.FC<FavoriteTableInterface> = () => {
       field: "category",
       headerName: "Categories",
       flex: 1,
-      minWidth: 150,
       renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
     },
     {
       field: "company",
       headerName: "Company",
       flex: 1,
-      minWidth: 150,
+      renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
+    },
+    {
+      field: "levelOfHappiness",
+      headerName: "Level of happiness",
+      flex: 1,
       renderCell: (params: GridRenderCellParams) => <>{params.value}</>,
     },
   ];
-
   return (
     <DataGrid
+      rows={stateFavorites}
+      columns={colums}
       disableColumnSelector
       disableSelectionOnClick
       autoHeight
-      pageSize={pageSizes}
-      rowsPerPageOptions={[pageSizes]}
-      rows={stateFavorites}
-      columns={columns}
-      getRowId={(row) => row.id}
+      pageSize={pageSize}
+      rowsPerPageOptions={[pageSize]}
+      getRowId={(row: any) => row.id}
     />
   );
 };

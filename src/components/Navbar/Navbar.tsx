@@ -19,7 +19,7 @@ export const Navbar: React.FC<NavbarProps> = () => {
       <AppBar position="fixed">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            SDLFDE
+            React Test, by: Ulises Ornelas using React, Redux, RxJS, Material UI
           </Typography>
           <IconButton
             color="secondary"
